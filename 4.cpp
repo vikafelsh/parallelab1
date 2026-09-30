@@ -10,15 +10,16 @@ mutex m;
 
 void AddToList(int value) {
     for (int i = 0; i < 10; i++) {
-        lock_guard<mutex> lock(m);
+        m.lock();
         l.push_back(value + i);
         cout << "Додано " << value + i << endl;
+        m.unlock();
     }
 }
 
 void ListContains(int value) {
     for (int i = 0; i < 10; i++) {
-        lock_guard<mutex> lock(m);
+        m.lock();
         bool found = false;
         for (int x : l) {
             if (x == value) found = true;
@@ -26,6 +27,7 @@ void ListContains(int value) {
 
         if (found) cout << "Входить" << endl;
         else cout << "Не входить" << endl;
+        m.unlock();
     }
 }
 
