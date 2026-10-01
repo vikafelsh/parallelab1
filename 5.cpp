@@ -10,19 +10,25 @@ mutex m;
 
 void AddToList(int value) {
     lock_guard<mutex> lock(m);
+
     l.push_back(value);
     cout << "Додано " << value << endl;
 }
 
 void ListContains(int value) {
     lock_guard<mutex> lock(m);
+
     bool found = false;
+
     for (int x : l) {
-        if (x == value) found = true;
+        if (x == value)
+            found = true;
     }
 
-    if (found) cout << "Входить" << endl;
-    else cout << "Не входить" << endl;
+    if (found)
+        cout << "Входить" << endl;
+    else
+        cout << "Не входить" << endl;
 }
 
 int main() {
@@ -31,10 +37,14 @@ int main() {
     int value = 5;
 
     for (int i = 0; i < 10; i++) {
-        thread t1(AddToList, value + i);   
-        thread t2(ListContains, value);    
+        thread t1(AddToList, value + i);
+        thread t2(ListContains, value);
 
         t1.detach();
         t2.detach();
     }
+
+    Sleep(1000);
+
+    return 0;
 }
