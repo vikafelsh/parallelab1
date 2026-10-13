@@ -44,10 +44,10 @@ public:
     static void Swap(exchangePerson& a, exchangePerson& b) {
         if (&a == &b) return;
 
-        std::lock(a.m, b.m);
+        unique_lock<mutex> lockA(a.m, defer_lock);
+        unique_lock<mutex> lockB(b.m, defer_lock);
 
-        lock_guard<mutex> lockA(a.m, adopt_lock);
-        lock_guard<mutex> lockB(b.m, adopt_lock);
+        std::lock(lockA, lockB);
 
         cout << "До обміну:" << endl;
         cout << "Об'єкт 1: ";
