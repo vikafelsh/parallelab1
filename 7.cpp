@@ -7,13 +7,14 @@ using namespace std;
 
 class someData {
 public:
-    string name;       
-    string surname;    
-    string address;    
-    int age;           
+    string name;
+    string surname;
+    string address;
+    int age = 0;
 
     void print() {
-        cout << name << " " << surname << ", " << address << ", " << age << endl;
+        cout << name << " " << surname << ", "
+            << address << ", " << age << endl;
     }
 };
 
@@ -24,6 +25,7 @@ public:
 
     static void JohnDoe(exchangePerson& p) {
         lock_guard<mutex> lock(p.m);
+
         p.data.name = "John";
         p.data.surname = "Doe";
         p.data.address = "Unknown";
@@ -32,6 +34,7 @@ public:
 
     static void JacobSmith(exchangePerson& p) {
         lock_guard<mutex> lock(p.m);
+
         p.data.name = "Jacob";
         p.data.surname = "Smith";
         p.data.address = "Known";
@@ -39,26 +42,28 @@ public:
     }
 
     static void Swap(exchangePerson& a, exchangePerson& b) {
-        
         if (&a == &b) return;
 
-        
-        unique_lock<mutex> lockA(a.m, defer_lock);
-        unique_lock<mutex> lockB(b.m, defer_lock);
+        std::lock(a.m, b.m);
 
-        
-        lock(lockA, lockB);
+        lock_guard<mutex> lockA(a.m, adopt_lock);
+        lock_guard<mutex> lockB(b.m, adopt_lock);
 
         cout << "До обміну:" << endl;
-        cout << "Об'єкт 1: "; a.data.print();
-        cout << "Об'єкт 2: "; b.data.print();
+        cout << "Об'єкт 1: ";
+        a.data.print();
+        cout << "Об'єкт 2: ";
+        b.data.print();
 
         swap(a.data, b.data);
 
         cout << "Після обміну:" << endl;
-        cout << "Об'єкт 1: "; a.data.print();
-        cout << "Об'єкт 2: "; b.data.print();
+        cout << "Об'єкт 1: ";
+        a.data.print();
+        cout << "Об'єкт 2: ";
+        b.data.print();
     }
+};
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
@@ -67,10 +72,12 @@ int main() {
 
     thread t1(exchangePerson::JohnDoe, ref(p1));
     thread t2(exchangePerson::JacobSmith, ref(p2));
+
     t1.detach();
     t2.detach();
 
     thread t3(exchangePerson::Swap, ref(p1), ref(p2));
-    t3.join();  
-}
+    t3.join();
 
+    return 0;
+}
